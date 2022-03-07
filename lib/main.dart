@@ -1,30 +1,36 @@
-import 'package:chatify_app/pages/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
+
+//Packages
 import 'package:provider/provider.dart';
 
-// Services
+//Services
 import './services/navigation_service.dart';
 
-// Providers
+//Providers
 import './providers/authentication_provider.dart';
 
-// Pages
+//Pages
 import './pages/splash_page.dart';
-import './pages/home_page.dart';
+import './pages/login_page.dart';
 import './pages/register_page.dart';
+import './pages/home_page.dart';
 
 void main() {
-  runApp(SplashPage(
+  runApp(
+    SplashPage(
       key: UniqueKey(),
       onInitializationComplete: () {
         runApp(
-          MainApp(),
+          const MainApp(),
         );
-      }));
+      },
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
+  const MainApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -38,18 +44,19 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Chatify',
         theme: ThemeData(
-          backgroundColor: Color.fromRGBO(36, 35, 49, 1.0),
-          scaffoldBackgroundColor: Color.fromRGBO(36, 35, 49, 1.0),
-          bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: Color.fromRGBO(30, 29, 37, 1.0),
+          fontFamily: "Comfortaa",
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          primaryColor: Colors.lightBlue,
+          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+            backgroundColor: Color.fromARGB(255, 0, 0, 0),
           ),
         ),
         navigatorKey: NavigationService.navigatorKey,
         initialRoute: '/login',
         routes: {
-          '/login': (BuildContext _context) => LoginPage(),
-          '/home': (BuildContext _context) => HomePage(),
-          '/register': (BuildContext _context) => RegisterPage(),
+          '/login': (BuildContext _context) => const LoginPage(),
+          '/register': (BuildContext _context) => const RegisterPage(),
+          '/home': (BuildContext _context) => const HomePage(),
         },
       ),
     );

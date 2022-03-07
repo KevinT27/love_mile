@@ -1,14 +1,15 @@
-import 'package:firebase_core/firebase_core.dart';
+//Packages
+// ignore_for_file: avoid_print
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 
-// Services
-
+//Services
 import '../services/database_service.dart';
 import '../services/navigation_service.dart';
 
-// Models
+//Models
 import '../models/chat_user.dart';
 
 class AuthenticationProvider extends ChangeNotifier {
@@ -30,18 +31,22 @@ class AuthenticationProvider extends ChangeNotifier {
           (_snapshot) {
             Map<String, dynamic> _userData =
                 _snapshot.data()! as Map<String, dynamic>;
-            user = ChatUser.fromJSON({
-              "uid": _user.uid,
-              "name": _userData["name"],
-              "email": _userData["email"],
-              "last_active": _userData["last_active"],
-              "image": _userData["image"],
-            });
+            user = ChatUser.fromJSON(
+              {
+                "uid": _user.uid,
+                "name": _userData["name"],
+                "email": _userData["email"],
+                "last_active": _userData["last_active"],
+                "image": _userData["image"],
+              },
+            );
             _navigationService.removeAndNavigateToRoute('/home');
           },
         );
       } else {
-        _navigationService.removeAndNavigateToRoute('/login');
+        if (_navigationService.getCurrentRoute() != '/login') {
+          _navigationService.removeAndNavigateToRoute('/login');
+        }
       }
     });
   }
@@ -51,9 +56,8 @@ class AuthenticationProvider extends ChangeNotifier {
     try {
       await _auth.signInWithEmailAndPassword(
           email: _email, password: _password);
-      print(_auth.currentUser);
     } on FirebaseAuthException {
-      print("Error loggin user into Firebase");
+      print("Error logging user into Firebase");
     } catch (e) {
       print(e);
     }
@@ -66,10 +70,11 @@ class AuthenticationProvider extends ChangeNotifier {
           email: _email, password: _password);
       return _credentials.user!.uid;
     } on FirebaseAuthException {
-      print("Error registering user");
+      print("Error registering user.");
     } catch (e) {
       print(e);
     }
+    return null;
   }
 
   Future<void> logout() async {

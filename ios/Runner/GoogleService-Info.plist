@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>670621695325-706cpsvv1t0pcfqqvvb68394lrp32qu6.apps.googleusercontent.com</string>
+	<string>854352289130-k7t334kdv1g3193qqimq3l34hkiataqo.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.670621695325-706cpsvv1t0pcfqqvvb68394lrp32qu6</string>
+	<string>com.googleusercontent.apps.854352289130-k7t334kdv1g3193qqimq3l34hkiataqo</string>
 	<key>API_KEY</key>
-	<string>AIzaSyA1JeK-86iefyKpDVo-nzYb8bP6zPffy_I</string>
+	<string>AIzaSyBpfS9qf0goocAGVUZfEBSBiXHhjEhGyKw</string>
 	<key>GCM_SENDER_ID</key>
-	<string>670621695325</string>
+	<string>854352289130</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.example.chatifyApp</string>
+	<string>com.example.lovemile</string>
 	<key>PROJECT_ID</key>
-	<string>flash-6f9cb</string>
+	<string>love-mile</string>
 	<key>STORAGE_BUCKET</key>
-	<string>flash-6f9cb.appspot.com</string>
+	<string>love-mile.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:670621695325:ios:4b1334c74304bb76dfbcb4</string>
+	<string>1:854352289130:ios:7e66f9359c06b609845913</string>
 </dict>
 </plist>

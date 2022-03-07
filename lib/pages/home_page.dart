@@ -1,11 +1,13 @@
-// Packages
+//Packages
 import 'package:flutter/material.dart';
 
-// Pages
+//Pages
 import '../pages/chats_page.dart';
 import '../pages/users_page.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _HomePageState();
@@ -15,9 +17,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   final List<Widget> _pages = [
-    ChatsPage(),
-    UsersPage(),
+    const ChatsPage(),
+    const UsersPage(),
   ];
+
   @override
   Widget build(BuildContext context) {
     return _buildUI();
@@ -33,14 +36,18 @@ class _HomePageState extends State<HomePage> {
             _currentPage = _index;
           });
         },
-        items: [
+        items: const [
           BottomNavigationBarItem(
             label: "Chats",
-            icon: Icon(Icons.chat_bubble_sharp),
+            icon: Icon(
+              Icons.chat_bubble_sharp,
+            ),
           ),
           BottomNavigationBarItem(
             label: "Users",
-            icon: Icon(Icons.supervised_user_circle_sharp),
+            icon: Icon(
+              Icons.supervised_user_circle_sharp,
+            ),
           ),
         ],
       ),
