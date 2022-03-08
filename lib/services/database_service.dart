@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/chat_message.dart';
 
 const String USER_COLLECTION = "Users";
+const String POOL_COLLECTION = "Pool";
 const String CHAT_COLLECTION = "Chats";
 const String MESSAGES_COLLECTION = "messages";
 
@@ -81,7 +82,6 @@ class DatabaseService {
             _message.toJson(),
           );
     } catch (e) {
-
       print(e);
     }
   }
@@ -111,7 +111,6 @@ class DatabaseService {
     try {
       await _db.collection(CHAT_COLLECTION).doc(_chatID).delete();
     } catch (e) {
-     
       print(e);
     }
   }
@@ -121,6 +120,30 @@ class DatabaseService {
       DocumentReference _chat =
           await _db.collection(CHAT_COLLECTION).add(_data);
       return _chat;
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  Future<DocumentReference?> addUserWithLocationToPool(
+      Map<String, dynamic> _data) async {
+    try {
+      // check if the user already exists
+      QuerySnapshot poolSnapshot = await _db
+          .collection(POOL_COLLECTION)
+          .where("user.email", isEqualTo: _data["user"]["email"])
+          .get();
+
+      if (poolSnapshot.docs.isNotEmpty) return null;
+
+      try {
+        DocumentReference _pool =
+            await _db.collection(POOL_COLLECTION).add(_data);
+        return _pool;
+      } catch (e) {
+        print(e);
+      }
     } catch (e) {
       print(e);
     }

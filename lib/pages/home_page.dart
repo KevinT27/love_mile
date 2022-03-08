@@ -1,7 +1,18 @@
 //Packages
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:love_mile/pages/chats_page.dart';
+
+// Services
+import 'package:love_mile/services/database_service.dart';
+import 'package:love_mile/services/location_service.dart';
+import 'package:provider/provider.dart';
+
+// Providers
+import '../providers/authentication_provider.dart';
+
+// Widges
 import 'package:love_mile/widgets/animated_logo.dart';
 import 'package:love_mile/widgets/emoji.dart';
 import 'package:love_mile/widgets/logo_dart.dart';
@@ -15,34 +26,43 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() {
     return _HomePageState();
   }
-
-
 }
 
 class _HomePageState extends State<HomePage> {
   late NavigationService _navigation;
-  
+  late LocationService _location;
+  late DatabaseService _database;
+
+  late AuthenticationProvider _auth;
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
     _navigation = GetIt.instance.get<NavigationService>();
-
-    Future.delayed(const Duration(seconds: 3),() {
-      _navigation.navigateToPage(const ChatsPage());
-    });
-
+    _location = GetIt.instance.get<LocationService>();
+    _database = GetIt.instance.get<DatabaseService>();
   }
-
 
   @override
   Widget build(BuildContext context) {
+    _auth = Provider.of<AuthenticationProvider>(context);
+    _location.determinePosition().then((position) async {
+      DocumentReference? _doc = await _database.addUserWithLocationToPool(
+        {
+          "user": _auth.user.toMap(),
+          "position": position.toJson(),
+          "searchingYN": false
+        },
+      );
+
+      // TODO: listen for user changes on pool 
+      String poolId = _doc!.id;
+    });
     return _buildUI();
   }
 
   Widget _buildUI() {
-
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -58,27 +78,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _headerArea () {
+  Widget _headerArea() {
     return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: const [
-          Logo(isStacked: true),
-          Emoji()],
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: const [Logo(isStacked: true), Emoji()],
     );
   }
 
-  Widget _scanner () {
+  Widget _scanner() {
     return Column(
       children: const [
-       AnimatedLogo(),
-        Text("Scanning your area...", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),),
+        AnimatedLogo(),
+        Text(
+          "Scanning your area...",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         Padding(
           padding: EdgeInsets.all(30.0),
-          child: Text("You know you're in love when you can't fall asleep because reality is finally better than your dreams.", textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w300),),
+          child: Text(
+            "You know you're in love when you can't fall asleep because reality is finally better than your dreams.",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w300),
+          ),
         )
       ],
     );
-
   }
 }
