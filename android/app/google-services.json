@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "854352289130",
+    "project_id": "love-mile",
+    "storage_bucket": "love-mile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854352289130:android:63c7f84bcc789769845913",
+        "android_client_info": {
+          "package_name": "com.example.love_mile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854352289130-fsg0akj6utbol80d2v8s6i87h2mj17dt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgKg_QVxsBQXxWi41-go5fDhSmla1gbxQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854352289130-fsg0akj6utbol80d2v8s6i87h2mj17dt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "854352289130-d3ick36su1buhq9d1n0tt7og02grc1f4.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com."
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

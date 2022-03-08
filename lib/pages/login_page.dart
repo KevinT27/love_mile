@@ -77,23 +77,11 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _pageTitle() {
-    return SizedBox(
-      height: _deviceHeight * 0.10,
-      child: const Text(
-        'Chatify',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 40,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
+
 
   Widget _loginForm() {
     return SizedBox(
-      height: _deviceHeight * 0.4,
+      height: _deviceHeight * 0.42,
       child: Form(
         key: _loginFormKey,
         child: Column(
@@ -124,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: _deviceHeight * 0.025),
             RoundedButton(
               name: "Login",
-              height: _deviceHeight * 0.065,
+              height: _deviceHeight * 0.07,
               width: _deviceWidth * 0.9,
               onPressed: () {
                 if (_loginFormKey.currentState!.validate()) {
@@ -141,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
             SizedBox(height: _deviceHeight * 0.01),
             RoundedButton(
                 name: "Register",
-                height: _deviceHeight * 0.065,
+                height: _deviceHeight * 0.08,
                 width: _deviceWidth * 0.9,
                 isInverted: true,
                 onPressed: () {
@@ -153,15 +141,5 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _registerAccountLink() {
-    return GestureDetector(
-      onTap: () => _navigation.navigateToRoute('/register'),
-      child: const Text(
-        'Don\'t have an account?',
-        style: TextStyle(
-          color: Colors.blueAccent,
-        ),
-      ),
-    );
-  }
+
 }
