@@ -42,6 +42,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _email;
   String? _password;
   String? _name;
+  String? _gender;
   PlatformFile? _profileImage;
 
   final _registerFormKey = GlobalKey<FormState>();
@@ -122,7 +123,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _registerForm() {
     return SizedBox(
-      height: _deviceHeight * 0.35,
+      height: _deviceHeight * 0.45,
       child: Form(
         key: _registerFormKey,
         child: Column(
@@ -134,7 +135,11 @@ class _RegisterPageState extends State<RegisterPage> {
               "Gender",
               style: TextStyle(fontSize: 17.5),
             ),
-            const Options(),
+            Options(onChanged: (_value) {
+              setState(() {
+                _gender = _value;
+              });
+            },),
             SizedBox(
               height: _deviceHeight * 0.02,
             ),
@@ -192,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
           print(_uid);
           String? _imageURL =
               await _cloudStorage.saveUserImageToStorage(_uid!, _profileImage!);
-          await _db.createUser(_uid, _email!, _name!, _imageURL!);
+          await _db.createUser(_uid, _email!, _name!, _gender!, _imageURL!);
           await _auth.logout();
           await _auth.loginUsingEmailAndPassword(_email!, _password!);
         }

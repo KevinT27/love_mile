@@ -45,19 +45,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    _database.deactivateUserSearching(_auth.user.uid);
+  }
+
+  @override
   Widget build(BuildContext context) {
     _auth = Provider.of<AuthenticationProvider>(context);
     _location.determinePosition().then((position) async {
-      DocumentReference? _doc = await _database.addUserWithLocationToPool(
+      DocumentReference? _doc = await _database.makeUserSearchable(
+        _auth.user.uid,
         {
-          "user": _auth.user.toMap(),
-          "position": position.toJson(),
-          "searchingYN": false
-        },
+          "lng": position.longitude,
+          "lat": position.latitude,
+        }
       );
 
       // TODO: listen for user changes on pool 
-      String poolId = _doc!.id;
+
     });
     return _buildUI();
   }

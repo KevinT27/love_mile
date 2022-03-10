@@ -17,7 +17,7 @@ class DatabaseService {
   DatabaseService();
 
   Future<void> createUser(
-      String _uid, String _email, String _name, String _imageURL) async {
+      String _uid, String _email, String _name, String _gender, String _imageURL) async {
     try {
       await _db.collection(USER_COLLECTION).doc(_uid).set(
         {
@@ -25,6 +25,10 @@ class DatabaseService {
           "image": _imageURL,
           "last_active": DateTime.now().toUtc(),
           "name": _name,
+          "searchingYN": false,
+          "gender": _gender,
+          "lng": 0.00,
+          "lat": 0.00
         },
       );
     } catch (e) {
@@ -126,27 +130,28 @@ class DatabaseService {
     return null;
   }
 
-  Future<DocumentReference?> addUserWithLocationToPool(
-      Map<String, dynamic> _data) async {
+  Future<DocumentReference?> makeUserSearchable(
+      String uid, Map<String, dynamic> _geoData) async {
     try {
-      // check if the user already exists
-      QuerySnapshot poolSnapshot = await _db
-          .collection(POOL_COLLECTION)
-          .where("user.email", isEqualTo: _data["user"]["email"])
-          .get();
-
-      if (poolSnapshot.docs.isNotEmpty) return null;
-
-      try {
-        DocumentReference _pool =
-            await _db.collection(POOL_COLLECTION).add(_data);
-        return _pool;
-      } catch (e) {
-        print(e);
-      }
+      await _db
+          .collection(USER_COLLECTION)
+          .doc(uid)
+          .update({..._geoData, "searchingYN": true});
     } catch (e) {
       print(e);
     }
+
     return null;
+  }
+
+  Future<void> deactivateUserSearching(String uid) async {
+    try {
+      await _db
+          .collection(USER_COLLECTION)
+          .doc(uid)
+          .set({"searchingYN": false});
+    } catch (e) {
+      print(e);
+    }
   }
 }

@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-enum SingingCharacter { male, female }
+
 
 class Options extends StatefulWidget {
-  const Options({Key? key}) : super(key: key);
+  final Function(String) onChanged;
+
+  const Options({Key? key, required this.onChanged}) : super(key: key);
 
   @override
   State<Options> createState() => _OptionsState();
 }
 
 class _OptionsState extends State<Options> {
-  SingingCharacter? _character = SingingCharacter.male;
+  String? _character = "male";
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -18,28 +20,30 @@ class _OptionsState extends State<Options> {
         Expanded(
           child: ListTile(
             title: const Text('Male'),
-            leading: Radio<SingingCharacter>(
-              value: SingingCharacter.male,
+            leading: Radio<String>(
+              value: "male",
               groupValue: _character,
-              onChanged: (SingingCharacter? value) {
+              onChanged: (_value) => {
                 setState(() {
-                  _character = value;
-                });
-              },
+                  _character = _value;
+                }),
+                widget.onChanged(_value!)
+              }
             ),
           ),
         ),
         Expanded(
           child: ListTile(
             title: const Text('Female'),
-            leading: Radio<SingingCharacter>(
+            leading: Radio<String>(
               activeColor: const Color(0xFFEA49A4),
-              value: SingingCharacter.female,
+              value: "female",
               groupValue: _character,
-              onChanged: (SingingCharacter? value) {
+              onChanged: (_value) => {
                 setState(() {
-                  _character = value;
-                });
+                  _character = _value;
+                }),
+                widget.onChanged(_value!)
               },
             ),
           ),
