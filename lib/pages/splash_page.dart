@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 //Packages
 import 'package:firebase_core/firebase_core.dart';
 import 'package:get_it/get_it.dart';
+import 'package:love_mile/services/network_service.dart';
 
 
 //Services
@@ -34,9 +35,9 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 1)).then(
-      (_) {
+          (_) {
         _setup().then(
-          (_) => widget.onInitializationComplete(),
+              (_) => widget.onInitializationComplete(),
         );
       },
     );
@@ -73,8 +74,12 @@ class _SplashPageState extends State<SplashPage> {
     GetIt.instance.registerSingleton<DatabaseService>(
       DatabaseService(),
     );
-     GetIt.instance.registerSingleton<LocationService>(
-      LocationService()
+    GetIt.instance.registerSingleton<LocationService>(
+        LocationService()
+    );
+
+    GetIt.instance.registerSingleton<NetworkService>(
+        NetworkService()
     );
   }
 }

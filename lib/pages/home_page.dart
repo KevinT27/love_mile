@@ -1,18 +1,22 @@
 //Packages
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:love_mile/models/chat.dart';
 import 'package:love_mile/pages/chats_page.dart';
 
 // Services
 import 'package:love_mile/services/database_service.dart';
 import 'package:love_mile/services/location_service.dart';
+import 'package:love_mile/services/network_service.dart';
 import 'package:provider/provider.dart';
 
 // Providers
 import '../providers/authentication_provider.dart';
 
-// Widges
+// Widgets
 import 'package:love_mile/widgets/animated_logo.dart';
 import 'package:love_mile/widgets/emoji.dart';
 import 'package:love_mile/widgets/logo_dart.dart';
@@ -32,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   late NavigationService _navigation;
   late LocationService _location;
   late DatabaseService _database;
+  late NetworkService _network;
 
   late AuthenticationProvider _auth;
 
@@ -42,6 +47,7 @@ class _HomePageState extends State<HomePage> {
     _navigation = GetIt.instance.get<NavigationService>();
     _location = GetIt.instance.get<LocationService>();
     _database = GetIt.instance.get<DatabaseService>();
+    _network = GetIt.instance.get<NetworkService>();
   }
 
   @override
@@ -56,15 +62,21 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     _auth = Provider.of<AuthenticationProvider>(context);
     _location.determinePosition().then((position) async {
-      DocumentReference? _doc = await _database.makeUserSearchable(
-        _auth.user.uid,
-        {
-          "lng": position.longitude,
-          "lat": position.latitude,
-        }
-      );
+      DocumentReference? _doc =
+          await _database.makeUserSearchable(_auth.user.uid, {
+        "lng": position.longitude,
+        "lat": position.latitude,
+      });
 
-      // TODO: listen for user changes on pool 
+      // TODO: listen for user changes on pool
+      final response = await _network.fetchData(
+          "https://us-central1-love-mile.cloudfunctions.net/findUserToChat");
+
+      if(response.statusCode == 200) {
+
+      } else {
+        throw Exception('Faled to execute the findUserToChat');
+      }
 
     });
     return _buildUI();
