@@ -16,8 +16,8 @@ class DatabaseService {
 
   DatabaseService();
 
-  Future<void> createUser(
-      String _uid, String _email, String _name, String _gender, String _imageURL) async {
+  Future<void> createUser(String _uid, String _email, String _name,
+      String _gender, String _imageURL) async {
     try {
       await _db.collection(USER_COLLECTION).doc(_uid).set(
         {
@@ -142,6 +142,17 @@ class DatabaseService {
     }
 
     return null;
+  }
+
+  Future<void> makeUserNotSearchable(String uid) async {
+    try {
+      await _db
+          .collection(USER_COLLECTION)
+          .doc(uid)
+          .update({"searchingYN": false});
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> deactivateUserSearching(String uid) async {

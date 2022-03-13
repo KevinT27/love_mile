@@ -16,9 +16,6 @@ import '../providers/authentication_provider.dart';
 import '../models/chat_user.dart';
 import '../models/chat.dart';
 
-//Pages
-import '../pages/chat_page.dart';
-
 class UsersPageProvider extends ChangeNotifier {
   final AuthenticationProvider _auth;
 
@@ -38,7 +35,6 @@ class UsersPageProvider extends ChangeNotifier {
     _navigation = GetIt.instance.get<NavigationService>();
     getUsers();
   }
-
 
   void getUsers({String? name}) async {
     _selectedUsers = [];
@@ -97,21 +93,11 @@ class UsersPageProvider extends ChangeNotifier {
           ),
         );
       }
-      ChatPage _chatPage = ChatPage(
-        chat: Chat(
-            uid: _doc!.id,
-            currentUserUid: _auth.user.uid,
-            members: _members,
-            messages: [],
-            activity: false,
-            group: _isGroup),
-      );
-      _selectedUsers = [];
-      notifyListeners();
-      _navigation.navigateToPage(_chatPage);
+
     } catch (e) {
       print("Error creating chat.");
       print(e);
     }
   }
+
 }

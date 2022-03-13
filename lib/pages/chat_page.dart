@@ -7,11 +7,9 @@ import 'package:provider/provider.dart';
 //Widgets
 import '../widgets/custom_input.dart';
 import '../widgets/top_bar.dart';
-import '../widgets/custom_list_view_tiles.dart';
 
 //Models
 import '../models/chat.dart';
-import '../models/chat_message.dart';
 
 //Providers
 import '../providers/authentication_provider.dart';
@@ -80,7 +78,7 @@ class _ChatPageState extends State<ChatPage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   TopBar(
-                    widget.chat.title(),
+                    "Chat Title",
                     fontSize: 10,
                     primaryAction: IconButton(
                       icon: const Icon(
@@ -117,25 +115,7 @@ class _ChatPageState extends State<ChatPage> {
       if (_pageProvider.messages!.isNotEmpty) {
         return SizedBox(
           height: _deviceHeight * 0.74,
-          child: ListView.builder(
-            controller: _messagesListViewController,
-            itemCount: _pageProvider.messages!.length,
-            itemBuilder: (BuildContext _context, int _index) {
-              ChatMessage _message = _pageProvider.messages![_index];
-              bool _isOwnMessage = _message.senderID == _auth.user.uid;
-              return CustomChatListViewTile(
-                deviceHeight: _deviceHeight,
-                width: _deviceWidth * 0.80,
-                message: _message,
-                isOwnMessage: _isOwnMessage,
-                sender: widget
-                    .chat
-                    .members
-                    .where((_m) => _m.uid == _message.senderID)
-                    .first,
-              );
-            },
-          ),
+          child: Scaffold()
         );
       } else {
         return const Align(

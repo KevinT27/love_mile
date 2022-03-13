@@ -100,9 +100,7 @@ class _ChatsPageState extends State<ChatsPage> {
             return ListView.builder(
               itemCount: _chats.length,
               itemBuilder: (BuildContext _context, int _index) {
-                return _chatTile(
-                  _chats[_index],
-                );
+                return Scaffold();
               },
             );
           } else {
@@ -121,30 +119,6 @@ class _ChatsPageState extends State<ChatsPage> {
           );
         }
       })(),
-    );
-  }
-
-  Widget _chatTile(Chat _chat) {
-    List<ChatUser> _recepients = _chat.recepients();
-    bool _isActive = _recepients.any((_d) => _d.wasRecentlyActive());
-    String _subtitleText = "";
-    if (_chat.messages.isNotEmpty) {
-      _subtitleText = _chat.messages.first.type != MessageType.TEXT
-          ? "Media Attachment"
-          : _chat.messages.first.content;
-    }
-    return CustomListViewTileWithActivity(
-      height: _deviceHeight * 0.10,
-      title: _chat.title(),
-      subtitle: _subtitleText,
-      imagePath: _chat.imageURL(),
-      isActive: _isActive,
-      isActivity: _chat.activity,
-      onTap: () {
-        _navigation.navigateToPage(
-          ChatPage(chat: _chat),
-        );
-      },
     );
   }
 }

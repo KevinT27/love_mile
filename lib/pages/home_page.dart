@@ -1,20 +1,18 @@
-//Packages
 import 'dart:convert';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:love_mile/models/chat.dart';
-import 'package:love_mile/pages/chats_page.dart';
 
 // Services
 import 'package:love_mile/services/database_service.dart';
 import 'package:love_mile/services/location_service.dart';
 import 'package:love_mile/services/network_service.dart';
+import 'package:love_mile/widgets/rounded_button.dart';
 import 'package:provider/provider.dart';
 
 // Providers
 import '../providers/authentication_provider.dart';
+import '../providers/home_page_provider.dart';
 
 // Widgets
 import 'package:love_mile/widgets/animated_logo.dart';
@@ -33,26 +31,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late double _deviceHeight;
+  late double _deviceWidth;
+
   late NavigationService _navigation;
   late LocationService _location;
   late DatabaseService _database;
   late NetworkService _network;
 
   late AuthenticationProvider _auth;
+  late HomePageProvider _home;
+
+  late HomePageProvider _pageProvider;
+
+  String _foundChat = "";
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
 
     _navigation = GetIt.instance.get<NavigationService>();
-    _location = GetIt.instance.get<LocationService>();
     _database = GetIt.instance.get<DatabaseService>();
     _network = GetIt.instance.get<NetworkService>();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
 
     _database.deactivateUserSearching(_auth.user.uid);
@@ -60,42 +65,52 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    _deviceHeight = MediaQuery.of(context).size.height;
+    _deviceWidth = MediaQuery.of(context).size.width;
     _auth = Provider.of<AuthenticationProvider>(context);
-    _location.determinePosition().then((position) async {
-      DocumentReference? _doc =
-          await _database.makeUserSearchable(_auth.user.uid, {
-        "lng": position.longitude,
-        "lat": position.latitude,
-      });
-
-      // TODO: listen for user changes on pool
-      final response = await _network.fetchData(
-          "https://us-central1-love-mile.cloudfunctions.net/findUserToChat");
-
-      if(response.statusCode == 200) {
-
-      } else {
-        throw Exception('Faled to execute the findUserToChat');
-      }
-
-    });
-    return _buildUI();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<HomePageProvider>(
+          create: (_) => HomePageProvider(_auth),
+        ),
+      ],
+      child: _buildUI(),
+    );
   }
 
   Widget _buildUI() {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(11.0),
-          child: Column(
-            children: [
-              _headerArea(),
-              _scanner(),
-            ],
+    return Builder(builder: (BuildContext _context) {
+      _pageProvider = _context.watch<HomePageProvider>();
+      _foundChat = _pageProvider.foundChat;
+      _isLoading = _pageProvider.isLoading;
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(11.0),
+            child: Column(
+              children: [
+                _headerArea(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      height: _deviceHeight * 0.5,
+                      child: () {
+                        if (_isLoading && _foundChat == "") {
+                          return _scanner();
+                        } else {
+                          return notFoundInfo();
+                        }
+                      }(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Widget _headerArea() {
@@ -121,7 +136,29 @@ class _HomePageState extends State<HomePage> {
             textAlign: TextAlign.center,
             style: TextStyle(fontWeight: FontWeight.w300),
           ),
-        )
+        ),
+      ],
+    );
+  }
+
+  Widget notFoundInfo() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 15),
+          child: Text(
+            "Ohhh dear! Seems like there is no active user within' one mile 😒",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w300, fontSize: 20),
+          ),
+        ),
+        RoundedButton(
+            name: "Another try?",
+            height: _deviceHeight * 0.065,
+            width: _deviceWidth * 0.65,
+            onPressed: _pageProvider.startUserSearching)
       ],
     );
   }

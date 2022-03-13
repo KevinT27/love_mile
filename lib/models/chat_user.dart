@@ -2,14 +2,16 @@ class ChatUser {
   final String uid;
   final String name;
   final String email;
-  final String imageURL;
+  final String image;
+  final String gender;
   late DateTime lastActive;
 
   ChatUser({
     required this.uid,
     required this.name,
     required this.email,
-    required this.imageURL,
+    required this.image,
+    required this.gender,
     required this.lastActive,
   });
 
@@ -18,8 +20,9 @@ class ChatUser {
       uid: _json["uid"],
       name: _json["name"],
       email: _json["email"],
-      imageURL: _json["image"],
-      lastActive: _json["last_active"].toDate(),
+      image: _json["image"],
+      gender: _json["gender"],
+      lastActive: _json["last_active"],
     );
   }
 
@@ -28,7 +31,7 @@ class ChatUser {
       "email": email,
       "name": name,
       "last_active": lastActive,
-      "image": imageURL,
+      "image": image,
     };
   }
 

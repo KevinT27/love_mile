@@ -29,6 +29,7 @@ class ChatPageProvider extends ChangeNotifier {
   final AuthenticationProvider _auth;
   final ScrollController _messagesListViewController;
 
+
   final String _chatId;
   List<ChatMessage>? messages;
 

@@ -12,4 +12,5 @@ class Chat {
     required this.user1,
     required this.user2,
     required this.messages
-  })
+  });
+}

@@ -108,7 +108,7 @@ class _UsersPageState extends State<UsersPage> {
                 height: _deviceHeight * 0.10,
                 title: _users[_index].name,
                 subtitle: "Last Active: ${_users[_index].lastDayActive()}",
-                imagePath: _users[_index].imageURL,
+                imagePath: _users[_index].image,
                 isActive: _users[_index].wasRecentlyActive(),
                 isSelected: _pageProvider.selectedUsers.contains(
                   _users[_index],
