@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:get_it/get_it.dart';
 import 'package:love_mile/widgets/options.dart';
 import 'package:provider/provider.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 //Services
 import '../services/media_service.dart';
@@ -43,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _password;
   String? _name;
   String? _gender;
-  PlatformFile? _profileImage;
+  String? _avatar = 'male_blonde';
 
   final _registerFormKey = GlobalKey<FormState>();
 
@@ -93,31 +94,14 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _profileImageField() {
     return GestureDetector(
       onTap: () {
-        GetIt.instance.get<MediaService>().pickImageFromLibrary().then(
-          (_file) {
-            setState(
-              () {
-                _profileImage = _file;
-              },
-            );
-          },
-        );
+        showMaterialModalBottomSheet(
+            context: context, builder: (context) => _emojiBottomSheet());
       },
-      child: () {
-        if (_profileImage != null) {
-          return RoundedImageFile(
-            key: UniqueKey(),
-            image: _profileImage!,
-            size: _deviceHeight * 0.15,
-          );
-        } else {
-          return RoundedImageNetwork(
-            key: UniqueKey(),
-            imagePath: "https://i.pravatar.cc/150?img=65",
-            size: _deviceHeight * 0.15,
-          );
-        }
-      }(),
+      child: RoundedImage(
+        key: UniqueKey(),
+        imagePath: 'assets/images/avatar_emojis/$_avatar.png',
+        size: _deviceHeight * 0.15,
+      ),
     );
   }
 
@@ -135,11 +119,14 @@ class _RegisterPageState extends State<RegisterPage> {
               "Gender",
               style: TextStyle(fontSize: 17.5),
             ),
-            Options(onChanged: (_value) {
-              setState(() {
-                _gender = _value;
-              });
-            },),
+            Options(
+              onChanged: (_value) {
+                setState(() {
+                  _gender = _value;
+                  _avatar = _gender == 'male' ? 'male_blonde' : 'female_blonde';
+                });
+              },
+            ),
             SizedBox(
               height: _deviceHeight * 0.02,
             ),
@@ -189,19 +176,54 @@ class _RegisterPageState extends State<RegisterPage> {
       height: _deviceHeight * 0.065,
       width: _deviceWidth * 0.65,
       onPressed: () async {
-        if (_registerFormKey.currentState!.validate() &&
-            _profileImage != null) {
+        if (_registerFormKey.currentState!.validate()) {
           _registerFormKey.currentState!.save();
           String? _uid = await _auth.registerUserUsingEmailAndPassword(
               _email!, _password!);
           print(_uid);
-          String? _imageURL =
-              await _cloudStorage.saveUserImageToStorage(_uid!, _profileImage!);
-          await _db.createUser(_uid, _email!, _name!, _gender!, _imageURL!);
+
+          await _db.createUser(_uid!, _email!, _name!, _gender!, _avatar!);
           await _auth.logout();
           await _auth.loginUsingEmailAndPassword(_email!, _password!);
         }
       },
+    );
+  }
+
+  Widget _emojiBottomSheet() {
+    const maleAvatars = ["male_blonde", "male_dark_blonde"];
+    const femaleAvatars = ["female_blonde", "female_black", "female_brown"];
+
+    final avatarsShowing = _gender == "male" ? maleAvatars : femaleAvatars;
+
+    return SafeArea(
+      child: Scaffold(
+        body: Column(
+          children: [
+            const Text(
+              "Select your avatar",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            Row(
+              children: avatarsShowing
+                  .map(
+                    (avatar) => RoundedImage(
+                      onTap: () {
+                        setState(() {
+                          _avatar = avatar;
+                        });
+                        Navigator.pop(context);
+                      },
+                      key: UniqueKey(),
+                      size: _deviceHeight * 0.15,
+                      imagePath: 'assets/images/avatar_emojis/$avatar.png',
+                    ),
+                  )
+                  .toList(),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

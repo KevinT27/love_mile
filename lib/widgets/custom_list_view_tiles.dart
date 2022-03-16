@@ -33,7 +33,8 @@ class CustomListViewTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      trailing: isSelected ? const Icon(Icons.check, color: Colors.white) : null,
+      trailing:
+          isSelected ? const Icon(Icons.check, color: Colors.white) : null,
       onTap: () => onTap(),
       minVerticalPadding: height * 0.20,
       leading: RoundedImageNetworkWithStatusIndicator(
@@ -152,10 +153,8 @@ class CustomChatListViewTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           !isOwnMessage
-              ? RoundedImageNetwork(
-                  key: UniqueKey(),
-                  imagePath: sender.image,
-                  size: width * 0.08)
+              ? RoundedImage(
+                  key: UniqueKey(), imagePath: sender.image, size: width * 0.08)
               : Container(),
           SizedBox(
             width: width * 0.05,

@@ -1,30 +1,34 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-class RoundedImageNetwork extends StatelessWidget {
+class RoundedImage extends StatelessWidget {
   final String imagePath;
   final double size;
+  final onTap;
 
-  const RoundedImageNetwork({
+  const RoundedImage({
     required Key key,
     required this.imagePath,
     required this.size,
-  }) : super(key: key);
+    this.onTap,
+  s}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: size,
-      width: size,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          fit: BoxFit.cover,
-          image: NetworkImage(imagePath),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            image: AssetImage(imagePath),
+          ),
+          borderRadius: BorderRadius.all(
+            Radius.circular(size),
+          ),
         ),
-        borderRadius: BorderRadius.all(
-          Radius.circular(size),
-        ),
-        color: Colors.black,
       ),
     );
   }
@@ -57,7 +61,7 @@ class RoundedImageFile extends StatelessWidget {
   }
 }
 
-class RoundedImageNetworkWithStatusIndicator extends RoundedImageNetwork {
+class RoundedImageNetworkWithStatusIndicator extends RoundedImage {
   final bool isActive;
 
   const RoundedImageNetworkWithStatusIndicator({
