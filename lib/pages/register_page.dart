@@ -43,7 +43,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _email;
   String? _password;
   String? _name;
-  String? _gender;
+  String? _gender = "male";
   String? _avatar = 'male_blonde';
 
   final _registerFormKey = GlobalKey<FormState>();
@@ -180,10 +180,10 @@ class _RegisterPageState extends State<RegisterPage> {
           _registerFormKey.currentState!.save();
           String? _uid = await _auth.registerUserUsingEmailAndPassword(
               _email!, _password!);
-          print(_uid);
+
 
           await _db.createUser(_uid!, _email!, _name!, _gender!, _avatar!);
-          await _auth.logout();
+
           await _auth.loginUsingEmailAndPassword(_email!, _password!);
         }
       },
@@ -208,12 +208,7 @@ class _RegisterPageState extends State<RegisterPage> {
               children: avatarsShowing
                   .map(
                     (avatar) => RoundedImage(
-                      onTap: () {
-                        setState(() {
-                          _avatar = avatar;
-                        });
-                        Navigator.pop(context);
-                      },
+
                       key: UniqueKey(),
                       size: _deviceHeight * 0.15,
                       imagePath: 'assets/images/avatar_emojis/$avatar.png',

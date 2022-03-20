@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 
 class TopBar extends StatelessWidget {
-  final String _barTitle;
+  final Widget barWidget;
   Widget? primaryAction;
   Widget? secondaryAction;
   double? fontSize;
@@ -11,8 +11,9 @@ class TopBar extends StatelessWidget {
   late double _deviceHeight;
   late double _deviceWidth;
 
-  TopBar(
-    this._barTitle, {Key? key, 
+  TopBar({
+    Key? key,
+    required this.barWidget,
     this.primaryAction,
     this.secondaryAction,
     this.fontSize = 35,
@@ -43,14 +44,6 @@ class TopBar extends StatelessWidget {
   }
 
   Widget _titleBar() {
-    return Text(
-      _barTitle,
-      overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: fontSize,
-        fontWeight: FontWeight.w700,
-      ),
-    );
+    return barWidget;
   }
 }

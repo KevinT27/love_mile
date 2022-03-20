@@ -96,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       height: _deviceHeight * 0.5,
                       child: () {
-                        if (_isLoading && _foundChat == "") {
+                        if (_isLoading) {
                           return _scanner();
                         } else {
                           return notFoundInfo();
@@ -117,7 +117,10 @@ class _HomePageState extends State<HomePage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: const [Logo(isStacked: true), Emoji()],
+      children: [
+        const Logo(isStacked: true),
+        logoutButton(),
+      ],
     );
   }
 
@@ -146,20 +149,35 @@ class _HomePageState extends State<HomePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Padding(
-          padding: EdgeInsets.symmetric(vertical: 15),
-          child: Text(
-            "Ohhh dear! Seems like there is no active user within' one mile 😒",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontWeight: FontWeight.w300, fontSize: 20),
-          ),
-        ),
         RoundedButton(
             name: "Another try?",
             height: _deviceHeight * 0.065,
             width: _deviceWidth * 0.65,
-            onPressed: _pageProvider.startUserSearching)
+            onPressed: _pageProvider.startUserSearching),
+        const Padding(
+          padding: EdgeInsets.symmetric(vertical: 15),
+          child: Text(
+            "Enable auto search",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w300, fontSize: 12),
+          ),
+        ),
       ],
+    );
+  }
+
+  Widget logoutButton() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 25),
+      child: TextButton(
+          onPressed: () {
+            _auth.logout();
+          },
+          child: const Text(
+            "Logout",
+            style:
+                TextStyle(fontSize: 17, color: Color(0xFFDB06A6), height: 1.5),
+          )),
     );
   }
 }

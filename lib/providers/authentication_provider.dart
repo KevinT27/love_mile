@@ -26,18 +26,22 @@ class AuthenticationProvider extends ChangeNotifier {
 
     _auth.authStateChanges().listen((_user) {
       if (_user != null) {
-        _databaseService.updateUserLastSeenTime(_user.uid);
+        // _databaseService.updateUserLastSeenTime(_user.uid);
         _databaseService.getUser(_user.uid).then(
-          (_snapshot) {
+              (_snapshot) {
             Map<String, dynamic> _userData =
-                _snapshot.data()! as Map<String, dynamic>;
+            _snapshot.data()! as Map<String, dynamic>;
+
+            print(_userData);
+
             user = ChatUser.fromJSON(
               {
                 "uid": _user.uid,
                 "name": _userData["name"],
                 "email": _userData["email"],
                 "last_active": _userData["last_active"],
-                "image": _userData["image"],
+                "avatar": _userData["avatar"],
+                "gender": _userData["gender"]
               },
             );
             _navigationService.removeAndNavigateToRoute('/home');
@@ -51,8 +55,8 @@ class AuthenticationProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> loginUsingEmailAndPassword(
-      String _email, String _password) async {
+  Future<void> loginUsingEmailAndPassword(String _email,
+      String _password) async {
     try {
       await _auth.signInWithEmailAndPassword(
           email: _email, password: _password);
@@ -63,8 +67,8 @@ class AuthenticationProvider extends ChangeNotifier {
     }
   }
 
-  Future<String?> registerUserUsingEmailAndPassword(
-      String _email, String _password) async {
+  Future<String?> registerUserUsingEmailAndPassword(String _email,
+      String _password) async {
     try {
       UserCredential _credentials = await _auth.createUserWithEmailAndPassword(
           email: _email, password: _password);

@@ -2,7 +2,7 @@ class ChatUser {
   final String uid;
   final String name;
   final String email;
-  final String image;
+  final String avatar;
   final String gender;
   late DateTime lastActive;
 
@@ -10,19 +10,21 @@ class ChatUser {
     required this.uid,
     required this.name,
     required this.email,
-    required this.image,
+    required this.avatar,
     required this.gender,
     required this.lastActive,
   });
 
   factory ChatUser.fromJSON(Map<String, dynamic> _json) {
+
     return ChatUser(
-      uid: _json["uid"],
+      uid: _json["uid"] ?? _json["id"],
       name: _json["name"],
       email: _json["email"],
-      image: _json["image"],
+      avatar: _json["avatar"],
       gender: _json["gender"],
-      lastActive: _json["last_active"],
+      lastActive: DateTime.fromMicrosecondsSinceEpoch(
+          _json["last_active"].microsecondsSinceEpoch),
     );
   }
 
@@ -31,7 +33,7 @@ class ChatUser {
       "email": email,
       "name": name,
       "last_active": lastActive,
-      "image": image,
+      "avatar": avatar,
     };
   }
 

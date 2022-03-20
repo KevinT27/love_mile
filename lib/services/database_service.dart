@@ -2,6 +2,7 @@
 // ignore_for_file: avoid_print, constant_identifier_names
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 //Models
 import '../models/chat_message.dart';
@@ -36,7 +37,7 @@ class DatabaseService {
     }
   }
 
-  Future<DocumentSnapshot> getUser(String _uid) {
+  Future<DocumentSnapshot> getUser(String _uid) async {
     return _db.collection(USER_COLLECTION).doc(_uid).get();
   }
 
@@ -74,6 +75,18 @@ class DatabaseService {
         .collection(MESSAGES_COLLECTION)
         .orderBy("sent_time", descending: false)
         .snapshots();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamChat(String _chatID) {
+    return _db.collection(CHAT_COLLECTION).doc(_chatID).snapshots();
+  }
+
+  Future<DocumentSnapshot<Map<String, dynamic>>> getChat(String _chatId) {
+    return _db.collection(CHAT_COLLECTION).doc(_chatId).get();
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> streamUserDoc(String _uid) {
+    return _db.collection(USER_COLLECTION).doc(_uid).snapshots();
   }
 
   Future<void> addMessageToChat(String _chatID, ChatMessage _message) async {
@@ -157,10 +170,27 @@ class DatabaseService {
 
   Future<void> deactivateUserSearching(String uid) async {
     try {
+
+
+
       await _db
           .collection(USER_COLLECTION)
           .doc(uid)
-          .set({"searchingYN": false});
+          .update({"searchingYN": false, "chatID": null});
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> closeChat(String uid) async {
+    try {
+
+
+
+      await _db
+          .collection(CHAT_COLLECTION)
+          .doc(uid)
+          .update({"closed": true});
     } catch (e) {
       print(e);
     }

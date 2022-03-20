@@ -5,10 +5,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:love_mile/models/chat_user.dart';
+import 'package:love_mile/pages/chat_page.dart';
 import 'package:love_mile/providers/authentication_provider.dart';
 import 'package:love_mile/services/database_service.dart';
 import 'package:love_mile/services/location_service.dart';
 import 'package:love_mile/services/network_service.dart';
+
+import '../models/chat.dart';
+import '../services/navigation_service.dart';
 
 class HomePageProvider extends ChangeNotifier {
   final AuthenticationProvider _auth;
@@ -16,6 +20,9 @@ class HomePageProvider extends ChangeNotifier {
   late LocationService _location;
   late DatabaseService _database;
   late NetworkService _network;
+  late NavigationService _navigation;
+
+  late StreamSubscription _userStream;
 
   String foundChat = "";
   bool isLoading = false;
@@ -24,16 +31,49 @@ class HomePageProvider extends ChangeNotifier {
     _location = GetIt.instance.get<LocationService>();
     _database = GetIt.instance.get<DatabaseService>();
     _network = GetIt.instance.get<NetworkService>();
-
+    _navigation = GetIt.instance.get<NavigationService>();
     startUserSearching();
   }
 
   void startUserSearching() async {
     isLoading = true;
     notifyListeners();
-    setUserInSearchMode().then((_) {
-      checkIfFitUserFound();
-    });
+    await setUserInSearchMode();
+    listenToUserChanges();
+  }
+
+  void listenToUserChanges() {
+    try {
+      _userStream = _database.streamUserDoc(_auth.user.uid).listen(
+        (_snapshot) async {
+          Map<String, dynamic> _userData = _snapshot.data()!;
+
+          if (_userData['chatID'] != null) {
+            // chat foudn
+            print('chat found');
+            final chatID = _userData['chatID'];
+            final _chatSnapshot = await _database.getChat(chatID);
+
+            Map<String, dynamic> _chatData = _chatSnapshot.data()!;
+
+            _chatData["id"] = chatID;
+
+            Chat _chat = Chat.fromJSON(_chatData);
+
+            _navigation.navigateToPage(ChatPage(chat: _chat));
+          }
+
+          if (_userData['searchingYN'] == false) {
+            isLoading = false;
+            notifyListeners();
+            return;
+          }
+        },
+      );
+    } catch (e) {
+      print("Error getting messages.");
+      print(e);
+    }
   }
 
   Future<DocumentReference<Object?>?> setUserInSearchMode() async {
@@ -48,63 +88,5 @@ class HomePageProvider extends ChangeNotifier {
     });
 
     return _doc;
-  }
-
-  void checkIfFitUserFound() async {
-    isLoading = true;
-    notifyListeners();
-
-    Future.delayed(const Duration(seconds: 3), () async {
-      try {
-        for (int i = 0; i <= 10;) {
-          // send http request if fitting user is available.
-          final response = await _network.fetchData(
-              'https://us-central1-love-mile.cloudfunctions.net/findUserToChat?uid=${_auth.user.uid}');
-
-          // check if the the response is 200
-          if (response.statusCode == 200) {
-            // decode json body
-            Map decodedBody = await jsonDecode(response.body);
-
-            // if the body contains notfoundYN there is still no searching result for the user
-            if (!decodedBody.containsKey("notfoundYN")) {
-              // get chat body -> convert  user1 and user2 to User class
-              print(decodedBody["user1"]["last_active"]);
-              ChatUser userOne = ChatUser.fromJSON({
-                ...decodedBody["user1"],
-                "last_active": DateTime.parse(
-                    decodedBody["user1"]["last_active"]["_seconds"].toString())
-              });
-              ChatUser userTwo = ChatUser.fromJSON({
-                ...decodedBody["user2"],
-                "last_active": DateTime.parse(
-                    decodedBody["user2"]["last_active"]["_seconds"].toString())
-              });
-
-              // TODO: navigate to chat page and pass the new chat as argument
-
-            }
-
-            // still no user found - set isLoading false to indicate that there is currently no one in the range.F
-            if (i >= 10) {
-              isLoading = false;
-              foundChat = "";
-              notifyListeners();
-            }
-          } else {
-            throw Exception('Failed to execute the findUserToChat');
-          }
-
-          i++;
-        }
-
-        await _database.makeUserNotSearchable(_auth.user.uid);
-      } catch (e) {
-        print(e);
-        isLoading = false;
-        foundChat = "";
-        notifyListeners();
-      }
-    });
   }
 }

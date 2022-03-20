@@ -115,9 +115,11 @@ class _LoginPageState extends State<LoginPage> {
               height: _deviceHeight * 0.07,
               width: _deviceWidth * 0.9,
               onPressed: () {
+
                 if (_loginFormKey.currentState!.validate()) {
                   _loginFormKey.currentState!.save();
                   _auth.loginUsingEmailAndPassword(_email!, _password!);
+
                 }
               },
             ),

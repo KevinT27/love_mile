@@ -2,10 +2,15 @@
 // ignore_for_file: prefer_const_constructors_in_immutables
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 
 //Widgets
+import '../models/chat_message.dart';
+import '../services/database_service.dart';
 import '../widgets/custom_input.dart';
+import '../widgets/custom_list_view_tiles.dart';
+import '../widgets/emoji.dart';
 import '../widgets/top_bar.dart';
 
 //Models
@@ -36,11 +41,13 @@ class _ChatPageState extends State<ChatPage> {
   late GlobalKey<FormState> _messageFormState;
   late ScrollController _messagesListViewController;
 
+
   @override
   void initState() {
     super.initState();
     _messageFormState = GlobalKey<FormState>();
     _messagesListViewController = ScrollController();
+
   }
 
   @override
@@ -52,7 +59,7 @@ class _ChatPageState extends State<ChatPage> {
       providers: [
         ChangeNotifierProvider<ChatPageProvider>(
           create: (_) => ChatPageProvider(
-              widget.chat.uid, _auth, _messagesListViewController),
+              widget.chat.id, _auth, _messagesListViewController),
         ),
       ],
       child: _buildUI(),
@@ -65,43 +72,45 @@ class _ChatPageState extends State<ChatPage> {
         _pageProvider = _context.watch<ChatPageProvider>();
         return Scaffold(
           body: SingleChildScrollView(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: _deviceWidth * 0.03,
-                vertical: _deviceHeight * 0.02,
-              ),
-              height: _deviceHeight,
-              width: _deviceWidth * 0.97,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TopBar(
-                    "Chat Title",
-                    fontSize: 10,
-                    primaryAction: IconButton(
-                      icon: const Icon(
-                        Icons.delete,
-                        color: Color.fromRGBO(0, 82, 218, 1.0),
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: _deviceWidth * 0.03,
+                  vertical: _deviceHeight * 0.02,
+                ),
+                height: _deviceHeight * 0.9,
+                width: _deviceWidth * 0.97,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TopBar(
+                      barWidget: Emoji(
+                          avatar: widget.chat.members
+                              .where((_m) => _m.uid != _auth.user.uid)
+                              .first
+                              .avatar),
+                      fontSize: 10,
+                      primaryAction: IconButton(
+                        icon:
+                            const Icon(Icons.cancel, color: Colors.transparent),
+                        onPressed: () {},
                       ),
-                      onPressed: () {
-                        _pageProvider.deleteChat();
-                      },
-                    ),
-                    secondaryAction: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back,
-                        color: Color.fromRGBO(0, 82, 218, 1.0),
+                      secondaryAction: IconButton(
+                        icon: const Icon(
+                          Icons.arrow_back,
+                          color: Color(0xFFDB06A6),
+                        ),
+                        onPressed: () {
+                          _pageProvider.goBack();
+                        },
                       ),
-                      onPressed: () {
-                        _pageProvider.goBack();
-                      },
                     ),
-                  ),
-                  _messagesListView(),
-                  _sendMessageForm(),
-                ],
+                    _messagesListView(),
+                    _sendMessageForm(),
+                  ],
+                ),
               ),
             ),
           ),
@@ -113,23 +122,41 @@ class _ChatPageState extends State<ChatPage> {
   Widget _messagesListView() {
     if (_pageProvider.messages != null) {
       if (_pageProvider.messages!.isNotEmpty) {
-        return SizedBox(
-          height: _deviceHeight * 0.74,
-          child: Scaffold()
+        return Container(
+          height: _deviceHeight * 0.54,
+          child: ListView.builder(
+            controller: _messagesListViewController,
+            itemCount: _pageProvider.messages!.length,
+            itemBuilder: (BuildContext _context, int _index) {
+              ChatMessage _message = _pageProvider.messages![_index];
+              bool _isOwnMessage = _message.senderID == _auth.user.uid;
+              return Container(
+                child: CustomChatListViewTile(
+                  deviceHeight: _deviceHeight,
+                  width: _deviceWidth * 0.50,
+                  message: _message,
+                  isOwnMessage: _isOwnMessage,
+                  sender: widget.chat.members
+                      .where((_m) => _m.uid == _message.senderID)
+                      .first,
+                ),
+              );
+            },
+          ),
         );
       } else {
         return const Align(
           alignment: Alignment.center,
           child: Text(
             "Be the first to say Hi!",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Colors.black),
           ),
         );
       }
     } else {
       return const Center(
         child: CircularProgressIndicator(
-          color: Colors.white,
+          color: Colors.black,
         ),
       );
     }
@@ -138,13 +165,9 @@ class _ChatPageState extends State<ChatPage> {
   Widget _sendMessageForm() {
     return Container(
       height: _deviceHeight * 0.06,
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(30, 29, 37, 1.0),
-        borderRadius: BorderRadius.circular(100),
-      ),
       margin: EdgeInsets.symmetric(
-        horizontal: _deviceWidth * 0.04,
-        vertical: _deviceHeight * 0.03,
+        horizontal: _deviceWidth * 0.03,
+        vertical: _deviceHeight * 0.001,
       ),
       child: Form(
         key: _messageFormState,
@@ -155,7 +178,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             _messageTextField(),
             _sendMessageButton(),
-            _imageMessageButton(),
+            // _imageMessageButton(),
           ],
         ),
       ),
@@ -164,7 +187,7 @@ class _ChatPageState extends State<ChatPage> {
 
   Widget _messageTextField() {
     return SizedBox(
-      width: _deviceWidth * 0.65,
+      width: _deviceWidth * 0.69,
       child: CustomTextFormField(
           onSaved: (_value) {
             _pageProvider.message = _value;
@@ -176,14 +199,14 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Widget _sendMessageButton() {
-    double _size = _deviceHeight * 0.04;
+    double _size = _deviceHeight * 0.08;
     return SizedBox(
       height: _size,
       width: _size,
       child: IconButton(
         icon: const Icon(
           Icons.send,
-          color: Colors.white,
+          color: Color(0xFFDB06A6),
         ),
         onPressed: () {
           if (_messageFormState.currentState!.validate()) {
@@ -202,12 +225,7 @@ class _ChatPageState extends State<ChatPage> {
       height: _size,
       width: _size,
       child: FloatingActionButton(
-        backgroundColor: const Color.fromRGBO(
-          0,
-          82,
-          218,
-          1.0,
-        ),
+        backgroundColor: const Color(0xFFDB06A6),
         onPressed: () {
           _pageProvider.sendImageMessage();
         },

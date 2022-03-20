@@ -23,17 +23,17 @@ class TextMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Color> _colorScheme = isOwnMessage
-        ? [const Color.fromRGBO(0, 136, 249, 1.0), const Color.fromRGBO(0, 82, 218, 1.0)]
-        : [
-            const Color.fromRGBO(51, 49, 68, 1.0),
-            const Color.fromRGBO(51, 49, 68, 1.0),
-          ];
+        ? [const Color(0x0fffffff), const Color(0x0fffffff)]
+        : [const Color(0xFFDB06A6), const Color(0xEBF31CB0)];
     return Container(
       height: height + (message.content.length / 20 * 6.0),
       width: width,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10),
+        border: isOwnMessage
+            ? Border.all(width: 1, color: const Color(0xFFDB06A6))
+            : Border.all(width: 0),
         gradient: LinearGradient(
           colors: _colorScheme,
           stops: const [0.30, 0.70],
@@ -48,14 +48,15 @@ class TextMessageBubble extends StatelessWidget {
         children: [
           Text(
             message.content,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: isOwnMessage ? const Color(0xFFDB06A6) : Colors.white,
             ),
           ),
           Text(
             timeago.format(message.sentTime),
-            style: const TextStyle(
-              color: Colors.white70,
+            style: TextStyle(
+              fontSize: 10,
+              color: isOwnMessage ? const Color(0xFFDB06A6) : Colors.white70,
             ),
           ),
         ],
@@ -79,9 +80,9 @@ class ImageMessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Color> _colorScheme = isOwnMessage
-        ? [const Color.fromRGBO(0, 136, 249, 1.0), const Color.fromRGBO(0, 82, 218, 1.0)]
+        ? [const Color(0xEBEE61B6), const Color(0xFFDB06A6)]
         : [
-            const Color.fromRGBO(51, 49, 68, 1.0),
+            const Color.fromRGBO(200, 199, 205, 1.0),
             const Color.fromRGBO(51, 49, 68, 1.0),
           ];
     DecorationImage _image = DecorationImage(

@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:love_mile/models/chat.dart';
 
 //Services
 import '../services/database_service.dart';
@@ -29,13 +30,14 @@ class ChatPageProvider extends ChangeNotifier {
   final AuthenticationProvider _auth;
   final ScrollController _messagesListViewController;
 
-
   final String _chatId;
   List<ChatMessage>? messages;
 
   late StreamSubscription _messagesStream;
   late StreamSubscription _keyboardVisibilityStream;
   late KeyboardVisibilityController _keyboardVisibilityController;
+
+  late DatabaseService _database;
 
   String? _message;
 
@@ -54,7 +56,10 @@ class ChatPageProvider extends ChangeNotifier {
     _media = GetIt.instance.get<MediaService>();
     _navigation = GetIt.instance.get<NavigationService>();
     _keyboardVisibilityController = KeyboardVisibilityController();
+    _database = GetIt.instance.get<DatabaseService>();
+
     listenToMessages();
+    checkChatStatus();
     listenToKeyboardChanges();
   }
 
@@ -62,6 +67,23 @@ class ChatPageProvider extends ChangeNotifier {
   void dispose() {
     _messagesStream.cancel();
     super.dispose();
+  }
+
+  void checkChatStatus() {
+    try {
+      _messagesStream = _db.streamChat(_chatId).listen(
+        (_snapshot) {
+          final chat = _snapshot.data();
+
+          if (chat!['closed'] != null) {
+            goBack();
+          }
+        },
+      );
+    } catch (e) {
+      print("Error getting messages.");
+      print(e);
+    }
   }
 
   void listenToMessages() {
@@ -138,7 +160,9 @@ class ChatPageProvider extends ChangeNotifier {
     _db.deleteChat(_chatId);
   }
 
-  void goBack() {
+  Future<void> goBack() async {
+
+    await _database.deactivateUserSearching(_auth.user.uid);
     _navigation.goBack();
   }
 }
